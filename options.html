@@ -25,6 +25,11 @@
       margin-bottom: 24px;
       font-size: 24px;
     }
+    h2 {
+      color: #003f7f;
+      font-size: 18px;
+      margin: 24px 0 16px;
+    }
     .field {
       margin-bottom: 20px;
     }
@@ -35,7 +40,8 @@
       font-size: 14px;
     }
     input[type="text"],
-    input[type="url"] {
+    input[type="url"],
+    input[type="password"] {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid #ccc;
@@ -43,7 +49,8 @@
       font-size: 14px;
     }
     input[type="text"]:focus,
-    input[type="url"]:focus {
+    input[type="url"]:focus,
+    input[type="password"]:focus {
       outline: none;
       border-color: #003f7f;
     }
@@ -66,6 +73,7 @@
       margin-top: 24px;
       display: flex;
       gap: 12px;
+      flex-wrap: wrap;
     }
     button {
       padding: 10px 20px;
@@ -81,15 +89,25 @@
     #save-btn:hover {
       background: #002a56;
     }
-    #clear-history-btn {
+    #test-connection-btn,
+    #test-github-btn {
       background: #e0e0e0;
       color: #333;
+    }
+    #clear-history-btn {
+      background: #fee2e2;
+      color: #c62828;
     }
     #status {
       margin-top: 12px;
       font-size: 14px;
       color: green;
       min-height: 20px;
+    }
+    hr {
+      margin: 24px 0;
+      border: none;
+      border-top: 1px solid #eee;
     }
   </style>
 </head>
@@ -109,8 +127,8 @@
       <div class="hint">Override the chat endpoint. Defaults to {backend-url}/api/chat</div>
     </div>
 
-    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
-    <h2 style="color: #003f7f; font-size: 18px; margin-bottom: 16px;">Local LLM (Ollama)</h2>
+    <hr />
+    <h2>Local LLM (Ollama)</h2>
 
     <div class="field">
       <label for="ollama-url">Ollama Base URL (optional)</label>
@@ -134,9 +152,8 @@
       <label for="enable-scoutbook" style="margin:0; font-weight:500;">Enable Scoutbook Plus Integration</label>
     </div>
 
-    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
-
-    <h2 style="color: #003f7f; font-size: 18px; margin-bottom: 16px;">Scoutbook Plus Authentication</h2>
+    <hr />
+    <h2>Scoutbook Plus Authentication</h2>
 
     <div class="field">
       <label for="scoutbook-username">Username</label>
@@ -150,9 +167,31 @@
       <div class="hint">Your Scoutbook Plus login password. Stored locally in browser.</div>
     </div>
 
+    <hr />
+    <h2>📦 Troop Inventory (GitHub)</h2>
+
+    <div class="field">
+      <label for="github-repo-url">GitHub Repository URL</label>
+      <input type="url" id="github-repo-url" placeholder="https://github.com/yourname/Troop123-Inventory" />
+      <div class="hint">The private GitHub repo where inventory.json is stored.</div>
+    </div>
+
+    <div class="field">
+      <label for="github-token">GitHub Personal Access Token</label>
+      <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+      <div class="hint">Token with 'repo' scope. Create at github.com/settings/tokens/new</div>
+    </div>
+
+    <div class="field">
+      <label for="troop-number">Troop Number</label>
+      <input type="text" id="troop-number" placeholder="e.g. 123" />
+      <div class="hint">Your troop's BSA number, stored in inventory.json.</div>
+    </div>
+
     <div class="actions">
       <button id="save-btn">Save Settings</button>
       <button id="test-connection-btn">Test Backend</button>
+      <button id="test-github-btn">Test GitHub</button>
       <button id="clear-history-btn">Clear Chat History</button>
     </div>
 

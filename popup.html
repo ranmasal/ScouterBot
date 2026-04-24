@@ -8,6 +8,7 @@
 </head>
 <body>
   <div class="app">
+    <!-- HEADER -->
     <header class="header">
       <h1>ScouterBot</h1>
       <div class="header-actions">
@@ -16,11 +17,15 @@
       </div>
     </header>
 
+    <!-- TOOLBAR -->
     <div class="toolbar">
       <button id="index-btn" title="Index Documents">📚 Index Docs</button>
       <button id="sources-btn" title="View Sources">📄 Sources</button>
+      <button id="inventory-btn" title="Troop Inventory">📦 Inventory</button>
+      <button id="setup-wizard-btn" title="Setup Wizard" class="hidden">🧙 Setup</button>
     </div>
 
+    <!-- CHAT -->
     <div id="chat-container" class="chat-container">
       <div id="messages" class="messages"></div>
     </div>
@@ -39,7 +44,282 @@
       <button id="search-scoutbook" title="Search Scoutbook Plus">🔍 Scoutbook Plus</button>
     </div>
 
-    <!-- Indexing Modal -->
+    <!-- ════════════════════════════════════════════
+         SETUP WIZARD OVERLAY
+         ════════════════════════════════════════════ -->
+    <div id="setup-wizard" class="wizard-overlay hidden">
+      <div class="wizard-content">
+        <!-- Progress bar -->
+        <div class="wizard-progress">
+          <div class="wizard-progress-bar" id="wizard-progress-bar"></div>
+        </div>
+
+        <!-- Step 1: Welcome -->
+        <div class="wizard-step" data-step="1">
+          <div class="wizard-icon">⚜</div>
+          <h2>Welcome to ScouterBot!</h2>
+          <p>Your AI assistant for Scouting America Adult Leaders. I'll help you with policies, procedures, advancement tracking, and troop inventory.</p>
+          <p class="wizard-hint">Let's get you set up in just a few steps.</p>
+          <div class="wizard-actions">
+            <button class="btn btn-primary wizard-next">Start Setup</button>
+            <button class="btn btn-ghost wizard-skip">Skip for now</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Backend Check -->
+        <div class="wizard-step hidden" data-step="2">
+          <div class="wizard-icon">🔌</div>
+          <h2>Backend Connection</h2>
+          <p>ScouterBot needs the Python backend running on your computer for AI features.</p>
+          <div class="wizard-status" id="wizard-backend-status">
+            <span class="status-dot checking"></span>
+            <span>Checking connection...</span>
+          </div>
+          <div class="wizard-info-box" id="wizard-backend-info">
+            <strong>Not connected.</strong><br>
+            The backend gives you AI chat, document search, and inventory features.
+            <ol>
+              <li>Open a terminal</li>
+              <li>Run: <code>cd backend && python server.py</code></li>
+              <li>Wait for "Server ready on http://localhost:8000"</li>
+            </ol>
+            <a href="#" id="wizard-test-backend" class="wizard-link">🔄 Test again</a>
+          </div>
+          <div class="wizard-actions">
+            <button class="btn btn-primary wizard-next" id="backend-next-btn">Continue</button>
+            <button class="btn btn-secondary wizard-back">Back</button>
+          </div>
+        </div>
+
+        <!-- Step 3: GitHub Integration Decision -->
+        <div class="wizard-step hidden" data-step="3">
+          <div class="wizard-icon">📦</div>
+          <h2>Troop Inventory via GitHub</h2>
+          <p>Connect ScouterBot to a GitHub repository to track your troop's inventory — patches, awards, equipment, and more.</p>
+          <p class="wizard-hint">The bot can then tell you exactly what to order and when.</p>
+
+          <div class="decision-tree">
+            <p class="decision-question">Would you like to connect your troop's inventory to GitHub?</p>
+            <div class="decision-buttons">
+              <button class="btn btn-primary" id="github-connect-now">✅ Yes, connect now</button>
+              <button class="btn btn-secondary" id="github-connect-later">⏱️ Later</button>
+            </div>
+          </div>
+
+          <!-- GitHub setup sub-steps (hidden initially) -->
+          <div id="github-setup-flow" class="github-flow hidden">
+            <hr class="wizard-divider" />
+
+            <!-- Sub-step A: Account check -->
+            <div class="github-substep" id="gh-step-account">
+              <p><strong>Step 1 of 4:</strong> Do you have a GitHub account?</p>
+              <div class="wizard-actions">
+                <button class="btn btn-primary" id="gh-has-account">Yes, I have one</button>
+                <button class="btn btn-secondary" id="gh-no-account">No, I need to create one</button>
+              </div>
+              <div id="gh-account-help" class="wizard-info-box hidden">
+                <p>No problem! Here's how to create a GitHub account:</p>
+                <ol>
+                  <li>Go to <a href="https://github.com/join" target="_blank">github.com/join</a></li>
+                  <li>Enter your email and create a password</li>
+                  <li>Verify your email address</li>
+                  <li>Come back here and click "I have an account"</li>
+                </ol>
+              </div>
+            </div>
+
+            <!-- Sub-step B: Create repo -->
+            <div class="github-substep hidden" id="gh-step-repo">
+              <p><strong>Step 2 of 4:</strong> Create a repository</p>
+              <ol>
+                <li>Go to <a href="https://github.com/new" target="_blank">github.com/new</a></li>
+                <li>Name it something like <code>Troop123-Inventory</code></li>
+                <li>Make it <strong>Private</strong></li>
+                <li>Check <strong>"Add a README file"</strong></li>
+                <li>Click <strong>Create repository</strong></li>
+              </ol>
+              <div class="form-field">
+                <label>Your repository URL:</label>
+                <input type="url" id="wizard-repo-url" placeholder="https://github.com/yourname/Troop123-Inventory" />
+              </div>
+              <div class="wizard-actions">
+                <button class="btn btn-primary" id="gh-repo-next">Continue</button>
+                <button class="btn btn-ghost" id="gh-repo-back">Back</button>
+              </div>
+            </div>
+
+            <!-- Sub-step C: Create PAT -->
+            <div class="github-substep hidden" id="gh-step-token">
+              <p><strong>Step 3 of 4:</strong> Create a Personal Access Token</p>
+              <p>ScouterBot needs a token to read and write your inventory file.</p>
+              <ol>
+                <li>Go to <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a></li>
+                <li>Give it a name like <code>ScouterBot-Inventory</code></li>
+                <li>Select <strong>repo</strong> (Full control of private repositories)</li>
+                <li>Click <strong>Generate token</strong></li>
+                <li><strong>Copy the token immediately</strong> — you won't see it again!</li>
+              </ol>
+              <div class="form-field">
+                <label>Your Personal Access Token:</label>
+                <input type="password" id="wizard-repo-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+              </div>
+              <div class="wizard-actions">
+                <button class="btn btn-primary" id="gh-token-next">Continue</button>
+                <button class="btn btn-ghost" id="gh-token-back">Back</button>
+              </div>
+            </div>
+
+            <!-- Sub-step D: Test & Save -->
+            <div class="github-substep hidden" id="gh-step-test">
+              <p><strong>Step 4 of 4:</strong> Test connection</p>
+              <div id="gh-test-status">Click "Test & Save" to verify everything works.</div>
+              <div class="wizard-actions">
+                <button class="btn btn-primary" id="gh-test-save">Test & Save</button>
+                <button class="btn btn-ghost" id="gh-test-back">Back</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- "Later" reminder -->
+          <div id="github-later-msg" class="wizard-info-box hidden">
+            <p>👍 No problem! You can connect your troop inventory anytime by going to <strong>Settings ⚙️ → Troop Inventory</strong>.</p>
+            <p>Until then, ScouterBot will still work great for answering questions about Scouting America policies and procedures.</p>
+          </div>
+
+          <div class="wizard-actions" id="step3-actions">
+            <button class="btn btn-secondary wizard-back">Back</button>
+          </div>
+        </div>
+
+        <!-- Step 4: All Set -->
+        <div class="wizard-step hidden" data-step="4">
+          <div class="wizard-icon">🎉</div>
+          <h2>You're All Set!</h2>
+          <p>ScouterBot is ready to help you lead your troop.</p>
+          <div id="wizard-summary" class="wizard-info-box"></div>
+          <div class="wizard-actions">
+            <button class="btn btn-primary wizard-finish">Start Using ScouterBot</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         INVENTORY MODAL
+         ════════════════════════════════════════════ -->
+    <div id="inventory-modal" class="modal hidden">
+      <div class="modal-content inventory-modal-content">
+        <div class="modal-header">
+          <h3>📦 Troop Inventory</h3>
+          <button class="modal-close" id="close-inventory">&times;</button>
+        </div>
+        <div id="inventory-body" class="inventory-body">
+          <div id="inventory-loading">Loading inventory...</div>
+          <div id="inventory-not-connected" class="hidden">
+            <p>Inventory not connected to GitHub yet.</p>
+            <button class="btn btn-primary" id="inventory-open-wizard">🧙 Run Setup Wizard</button>
+            <button class="btn btn-secondary" id="inventory-open-options">⚙️ Open Settings</button>
+          </div>
+          <div id="inventory-list" class="hidden">
+            <div class="inventory-toolbar">
+              <input type="text" id="inventory-search" placeholder="🔍 Search items..." />
+              <button class="btn btn-primary" id="btn-add-item">+ Add Item</button>
+              <button class="btn btn-secondary" id="btn-refresh-inventory">🔄 Refresh</button>
+            </div>
+            <div id="inventory-categories"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD/EDIT ITEM MODAL -->
+    <div id="item-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="item-modal-title">Add Item</h3>
+          <button class="modal-close" id="close-item">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-field">
+            <label>Item Name</label>
+            <input type="text" id="item-name" placeholder="e.g. Tenderfoot Patch" />
+          </div>
+          <div class="form-field">
+            <label>Category</label>
+            <select id="item-category">
+              <option value="advancements">Advancements</option>
+              <option value="awards">Awards</option>
+              <option value="uniforms">Uniforms</option>
+              <option value="equipment">Equipment</option>
+              <option value="camping">Camping Gear</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>On Hand</label>
+              <input type="number" id="item-on-hand" value="0" min="0" />
+            </div>
+            <div class="form-field">
+              <label>On Order</label>
+              <input type="number" id="item-on-order" value="0" min="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Min Stock</label>
+              <input type="number" id="item-min-stock" value="0" min="0" />
+            </div>
+            <div class="form-field">
+              <label>Unit</label>
+              <input type="text" id="item-unit" placeholder="each, box, dozen" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Supplier / SKU (optional)</label>
+            <input type="text" id="item-sku" placeholder="scoutshop.org #641234" />
+          </div>
+          <div class="form-field">
+            <label>Notes</label>
+            <textarea id="item-notes" rows="2" placeholder="Keep extra for mid-year crossovers..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-save-item" class="btn btn-primary">Save Item</button>
+          <button class="btn btn-ghost" id="cancel-item">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER RECOMMENDATION MODAL -->
+    <div id="order-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🛒 Order Recommendation</h3>
+          <button class="modal-close" id="close-order">&times;</button>
+        </div>
+        <div class="modal-body" id="order-body">
+          <div id="order-calculation"></div>
+          <div class="form-field">
+            <label>How many will you actually order?</label>
+            <input type="number" id="order-override-qty" min="0" />
+            <div class="hint" id="order-hint"></div>
+          </div>
+          <div class="form-field">
+            <label>Reason for override (optional)</label>
+            <textarea id="order-override-reason" rows="2" placeholder="Ordering extra for just-in-case..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-confirm-order" class="btn btn-primary">Confirm Order</button>
+          <button class="btn btn-ghost" id="cancel-order">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         INDEXING MODAL
+         ════════════════════════════════════════════ -->
     <div id="index-modal" class="modal hidden">
       <div class="modal-content">
         <h3>Document Indexing</h3>
@@ -52,7 +332,9 @@
       </div>
     </div>
 
-    <!-- Sources Modal -->
+    <!-- ════════════════════════════════════════════
+         SOURCES MODAL
+         ════════════════════════════════════════════ -->
     <div id="sources-modal" class="modal hidden">
       <div class="modal-content">
         <h3>Document Sources</h3>

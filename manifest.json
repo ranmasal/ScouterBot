@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "ScouterBot",
-  "version": "1.0.0",
-  "description": "AI assistant for Scouting America Adult Leaders with chat, RAG document access, and Scoutbook Plus search.",
+  "version": "1.1.0",
+  "description": "AI assistant for Scouting America Adult Leaders with chat, RAG document access, Scoutbook Plus search, and troop inventory management via GitHub.",
   "permissions": [
     "storage",
     "activeTab",
@@ -13,7 +13,8 @@
     "https://scoutbook.scouting.org/*",
     "https://*.scouting.org/*",
     "http://localhost:8000/*",
-    "http://127.0.0.1:8000/*"
+    "http://127.0.0.1:8000/*",
+    "https://api.github.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -30,7 +31,8 @@
     {
       "matches": [
         "https://scoutbook.scouting.org/*",
-        "https://www.scouting.org/*"
+        "https://www.scouting.org/*",
+        "https://advancements.scouting.org/*"
       ],
       "js": ["content-script.js"],
       "run_at": "document_idle"

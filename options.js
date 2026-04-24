@@ -7,8 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const enableScoutbookCheckbox = document.getElementById('enable-scoutbook');
   const scoutbookUsernameInput = document.getElementById('scoutbook-username');
   const scoutbookPasswordInput = document.getElementById('scoutbook-password');
+  const githubRepoUrlInput = document.getElementById('github-repo-url');
+  const githubTokenInput = document.getElementById('github-token');
+  const troopNumberInput = document.getElementById('troop-number');
   const saveBtn = document.getElementById('save-btn');
   const testConnectionBtn = document.getElementById('test-connection-btn');
+  const testGitHubBtn = document.getElementById('test-github-btn');
   const clearHistoryBtn = document.getElementById('clear-history-btn');
   const statusEl = document.getElementById('status');
 
@@ -16,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
   chrome.storage.sync.get([
     'webhookUrl', 'enableRag', 'enableScoutbookSearch',
     'backendUrl', 'scoutbookUsername', 'scoutbookPassword',
-    'ollamaUrl', 'ollamaModel'
+    'ollamaUrl', 'ollamaModel',
+    'githubRepoUrl', 'githubToken', 'troopNumber'
   ], (result) => {
     backendUrlInput.value = result.backendUrl || 'http://localhost:8000';
     webhookInput.value = result.webhookUrl || '';
@@ -26,6 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
     enableScoutbookCheckbox.checked = result.enableScoutbookSearch !== false;
     scoutbookUsernameInput.value = result.scoutbookUsername || '';
     scoutbookPasswordInput.value = result.scoutbookPassword || '';
+    githubRepoUrlInput.value = result.githubRepoUrl || '';
+    githubTokenInput.value = result.githubToken || '';
+    troopNumberInput.value = result.troopNumber || '';
   });
 
   saveBtn.addEventListener('click', () => {
@@ -38,9 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
       enableScoutbookSearch: enableScoutbookCheckbox.checked,
       scoutbookUsername: scoutbookUsernameInput.value.trim(),
       scoutbookPassword: scoutbookPasswordInput.value,
+      githubRepoUrl: githubRepoUrlInput.value.trim(),
+      githubToken: githubTokenInput.value.trim(),
+      troopNumber: troopNumberInput.value.trim()
     };
 
-    // Auto-populate webhook URL from backend URL if not set
     if (settings.backendUrl && !settings.webhookUrl) {
       settings.webhookUrl = `${settings.backendUrl}/api/chat`;
     }
@@ -56,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   testConnectionBtn.addEventListener('click', async () => {
     const backendUrl = backendUrlInput.value.trim() || 'http://localhost:8000';
-    showStatus('Testing connection...');
+    showStatus('Testing backend connection...');
 
     try {
       const response = await fetch(`${backendUrl}/api/status`, {
@@ -76,6 +86,33 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       showStatus(`❌ Connection failed: ${err.message}. Is the backend running?`, true);
+    }
+  });
+
+  testGitHubBtn.addEventListener('click', async () => {
+    const repoUrl = githubRepoUrlInput.value.trim();
+    const token = githubTokenInput.value.trim();
+
+    if (!repoUrl || !token) {
+      showStatus('Please enter both GitHub repo URL and token.', true);
+      return;
+    }
+
+    showStatus('Testing GitHub connection...');
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: 'TEST_GITHUB_CONNECTION',
+        payload: { repoUrl, token }
+      });
+
+      if (response && response.success) {
+        showStatus(`✅ GitHub connected! Repo: ${response.data.owner}/${response.data.repo}`);
+      } else {
+        showStatus(`❌ GitHub error: ${response?.error || 'Unknown error'}`, true);
+      }
+    } catch (err) {
+      showStatus(`❌ Error: ${err.message}`, true);
     }
   });
 
