@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScouterBot</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>ScouterBot</h1>
+      <div class="header-actions">
+        <span id="backend-status" class="status-indicator" title="Backend Status">●</span>
+        <button id="open-options" title="Settings">⚙️</button>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <button id="index-btn" title="Index Documents">📚 Index Docs</button>
+      <button id="sources-btn" title="View Sources">📄 Sources</button>
+    </div>
+
+    <div id="chat-container" class="chat-container">
+      <div id="messages" class="messages"></div>
+    </div>
+
+    <div class="input-area">
+      <input
+        type="text"
+        id="chat-input"
+        placeholder="Ask about Scouting America..."
+        autocomplete="off"
+      />
+      <button id="send-btn" title="Send">➤</button>
+    </div>
+
+    <div class="footer">
+      <button id="search-scoutbook" title="Search Scoutbook Plus">🔍 Scoutbook Plus</button>
+    </div>
+
+    <!-- Indexing Modal -->
+    <div id="index-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Document Indexing</h3>
+        <p id="index-status">Click "Start Indexing" to fetch Scouting America documents.</p>
+        <div class="modal-actions">
+          <button id="start-index">Start Indexing</button>
+          <button id="force-index">Force Re-index</button>
+          <button id="close-index">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sources Modal -->
+    <div id="sources-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Document Sources</h3>
+        <div id="sources-list" class="sources-list"></div>
+        <div class="modal-actions">
+          <button id="close-sources">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
+

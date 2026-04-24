@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "ScouterBot",
+  "version": "1.0.0",
+  "description": "AI assistant for Scouting America Adult Leaders with chat, RAG document access, and Scoutbook Plus search.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.scouting.org/*",
+    "https://scoutbook.scouting.org/*",
+    "https://*.scouting.org/*",
+    "http://localhost:8000/*",
+    "http://127.0.0.1:8000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://scoutbook.scouting.org/*",
+        "https://www.scouting.org/*"
+      ],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
+

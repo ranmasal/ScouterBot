@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScouterBot Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      padding: 40px 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    h1 {
+      color: #003f7f;
+      margin-bottom: 24px;
+      font-size: 24px;
+    }
+    .field {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    input[type="text"],
+    input[type="url"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    input[type="text"]:focus,
+    input[type="url"]:focus {
+      outline: none;
+      border-color: #003f7f;
+    }
+    .hint {
+      font-size: 12px;
+      color: #777;
+      margin-top: 4px;
+    }
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .checkbox-field input {
+      width: 18px;
+      height: 18px;
+    }
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #save-btn {
+      background: #003f7f;
+      color: #fff;
+    }
+    #save-btn:hover {
+      background: #002a56;
+    }
+    #clear-history-btn {
+      background: #e0e0e0;
+      color: #333;
+    }
+    #status {
+      margin-top: 12px;
+      font-size: 14px;
+      color: green;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ScouterBot Settings</h1>
+
+    <div class="field">
+      <label for="backend-url">Backend URL</label>
+      <input type="url" id="backend-url" placeholder="http://localhost:8000" />
+      <div class="hint">The base URL of your ScouterBot RAG backend server.</div>
+    </div>
+
+    <div class="field">
+      <label for="webhook-url">RAG Webhook URL (optional)</label>
+      <input type="url" id="webhook-url" placeholder="http://localhost:8000/api/chat" />
+      <div class="hint">Override the chat endpoint. Defaults to {backend-url}/api/chat</div>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
+    <h2 style="color: #003f7f; font-size: 18px; margin-bottom: 16px;">Local LLM (Ollama)</h2>
+
+    <div class="field">
+      <label for="ollama-url">Ollama Base URL (optional)</label>
+      <input type="url" id="ollama-url" placeholder="http://localhost:11434" />
+      <div class="hint">Leave empty to use backend default. Install Ollama for free local LLM inference.</div>
+    </div>
+
+    <div class="field">
+      <label for="ollama-model">Ollama Model</label>
+      <input type="text" id="ollama-model" placeholder="llama3.2" />
+      <div class="hint">Default: llama3.2. Other options: phi4, mistral, gemma2</div>
+    </div>
+
+    <div class="checkbox-field">
+      <input type="checkbox" id="enable-rag" />
+      <label for="enable-rag" style="margin:0; font-weight:500;">Enable RAG Document Retrieval</label>
+    </div>
+
+    <div class="checkbox-field">
+      <input type="checkbox" id="enable-scoutbook" />
+      <label for="enable-scoutbook" style="margin:0; font-weight:500;">Enable Scoutbook Plus Integration</label>
+    </div>
+
+    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
+
+    <h2 style="color: #003f7f; font-size: 18px; margin-bottom: 16px;">Scoutbook Plus Authentication</h2>
+
+    <div class="field">
+      <label for="scoutbook-username">Username</label>
+      <input type="text" id="scoutbook-username" placeholder="your_scoutbook_username" />
+      <div class="hint">Your Scoutbook Plus login username.</div>
+    </div>
+
+    <div class="field">
+      <label for="scoutbook-password">Password</label>
+      <input type="password" id="scoutbook-password" placeholder="your_scoutbook_password" />
+      <div class="hint">Your Scoutbook Plus login password. Stored locally in browser.</div>
+    </div>
+
+    <div class="actions">
+      <button id="save-btn">Save Settings</button>
+      <button id="test-connection-btn">Test Backend</button>
+      <button id="clear-history-btn">Clear Chat History</button>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
+

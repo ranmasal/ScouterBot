@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ScouterBot Icon Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 12px; }
+    h1 { color: #003f7f; }
+    canvas { border: 1px solid #ccc; margin: 8px; display: block; }
+    .icon-row { display: flex; align-items: center; margin-bottom: 12px; }
+    .icon-row label { width: 80px; font-weight: bold; }
+    a { display: inline-block; margin-top: 4px; color: #003f7f; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ScouterBot Icon Generator</h1>
+    <p>Right-click each canvas and choose <strong>"Save image as..."</strong> to download the PNG icons. Place them in this folder with the correct filenames.</p>
+
+    <div class="icon-row">
+      <label>16x16</label>
+      <canvas id="c16" width="16" height="16"></canvas>
+      <a id="d16" download="icon16.png">Download icon16.png</a>
+    </div>
+
+    <div class="icon-row">
+      <label>48x48</label>
+      <canvas id="c48" width="48" height="48"></canvas>
+      <a id="d48" download="icon48.png">Download icon48.png</a>
+    </div>
+
+    <div class="icon-row">
+      <label>128x128</label>
+      <canvas id="c128" width="128" height="128"></canvas>
+      <a id="d128" download="icon128.png">Download icon128.png</a>
+    </div>
+  </div>
+
+  <script>
+    function drawIcon(size, canvasId, linkId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      const r = size * 0.2;
+
+      // Background
+      ctx.fillStyle = '#003f7f';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, r);
+      ctx.fill();
+
+      // Letter S
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${size * 0.55}px Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('S', size * 0.45, size * 0.55);
+
+      // Red dot
+      ctx.fillStyle = '#ce1126';
+      ctx.beginPath();
+      ctx.arc(size * 0.78, size * 0.28, size * 0.14, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Update download link
+      const link = document.getElementById(linkId);
+      link.href = canvas.toDataURL('image/png');
+    }
+
+    drawIcon(16, 'c16', 'd16');
+    drawIcon(48, 'c48', 'd48');
+    drawIcon(128, 'c128', 'd128');
+  </script>
+</body>
+</html>
+
